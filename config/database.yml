@@ -1,0 +1,43 @@
+# SQLite. Versions 3.8.0 and up are supported.
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem "sqlite3"
+#
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  database: <%= ENV['DB_NAME'] %>
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DP_PORT'] %>
+
+# For local development inside a Docker container
+docker:
+  <<: *default
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: storage/test.sqlite3
+
+# Development is a development environment located in an AWS ECS cluster
+# a CodePipeline will deploy to this environment automatically when code
+# is merged into the development branch of the GitHub repository
+development:
+  <<: *default
+
+# Staging is an environment designed for user acceptance testing (release candidate).
+# It is located on an AWS ECS cluster. A CodePipeline will deploy to this environment
+# automatically when code is merged into the staging branch of the GitHub repository.
+staging:
+  <<: *default
+
+# The Production environment running on an AWS ECS cluster.
+production:
+  <<: *default
+  database: storage/production.sqlite3

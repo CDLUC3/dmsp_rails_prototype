@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+# If running the rails server then create or migrate existing database
+if [ "${3}" == "rails" ] && [ "${4}" == "server" ]; then
+  echo "Running db:prepare to run pending migrations (or initial the DB if this is the first time)"
+  ./bin/rails db:prepare
+fi
+
+exec "${@}"

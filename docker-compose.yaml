@@ -1,0 +1,56 @@
+version: "2"
+
+volumes:
+  mysql:
+
+services:
+  mysql:
+    image: mysql/mysql-server:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: dmsp
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: "${DATABASE_USERNAME}"
+      MYSQL_PASSWORD: "${DATABASE_PASSWORD}"
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  app:
+    depends_on:
+      - mysql
+    build: .
+    command: "bundle exec rails server -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ".:/app"
+    ports:
+      - "3001:3000"
+    expose:
+      - "3001"
+    links:
+      - mysql
+    environment:
+      RAILS_ENV: "docker"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: "dmsp"
+      DB_USER: "${DATABASE_USERNAME}"
+      DB_PASSWORD: "${DATABASE_PASSWORD}"
+    develop:
+      watch:
+        # Watch the files in the app/ dir and update the container when they change
+        - action: sync
+          path: ./app
+          target: /rails/app
+          # ignore:
+          #   - node_modules/
+
+        # Rebuild the container if any changes are made to the Gemfile
+        - action: rebuild
+          path: Gemfile.lock
+
+        # Rebuild the container if any changes are made to the config/ files
+        - action: rebuild
+          path: ./config
