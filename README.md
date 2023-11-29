@@ -2,6 +2,9 @@
 
 This is the Rails 7 API application that supports the new DMSP UI.
 
+It comproses the "Fargate" portion of this system diagram
+<img src="docs/dmsp_prototype.png?raw=true">
+
 ## Installation
 
 - Clone this repository
