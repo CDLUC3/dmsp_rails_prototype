@@ -1,4 +1,4 @@
-version: "2"
+version: "2.3"
 
 volumes:
   mysql:
@@ -38,6 +38,8 @@ services:
       DB_NAME: "dmsp"
       DB_USER: "${DATABASE_USERNAME}"
       DB_PASSWORD: "${DATABASE_PASSWORD}"
+    # TODO: Monitor the compose watch project. It currently is not allowing sync. There is an open discussion
+    #       here: https://github.com/docker/compose/issues/11102
     develop:
       watch:
         # Watch the files in the app/ dir and update the container when they change

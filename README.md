@@ -14,11 +14,11 @@ MYSQL_ROOT_PASSWORD=[my-dba-password]
 DATABASE_USERNAME=[rails-app-username]
 DATABASE_PASSWORD=[rails-app-password]
 ```
-- Build and run the local MySQL container: `docker-compose up mysql --build`
-- Build and run the Rails API application (in a separate terminal window) : `docker-compose up app --build`
-- Verify that the system is running and available (in a separate terminal window) : `curl -v http://localhost:3001/up`
+- Build and run the local MySQL container and Rails app: `docker-compose build`
+- Start both containers: `docker-compose up`
+- Verify that the system is running and available (in a separate terminal window): `curl -v http://localhost:3001/up`
 
-Once both containers have been built the 1st time, you can simply run `docker-compose up`
+To run DB migrations or other Rails/Rake scripts, you can run the following to connect to the container (in a separate terminal window): `docker-compose run app bash`
 
 ## Deploying
 
