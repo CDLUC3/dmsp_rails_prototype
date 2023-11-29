@@ -44,13 +44,11 @@ services:
         - action: sync
           path: ./app
           target: /rails/app
-          # ignore:
-          #   - node_modules/
 
-        # Rebuild the container if any changes are made to the Gemfile
+        # Rebuild the container if any changes are made to these locations
         - action: rebuild
-          path: Gemfile.lock
-
-        # Rebuild the container if any changes are made to the config/ files
+          path: ./bin
         - action: rebuild
           path: ./config
+        - action: rebuild
+          path: Gemfile.lock
