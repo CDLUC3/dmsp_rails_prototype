@@ -38,6 +38,9 @@ gem "bootsnap", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
+# Gem to help make HTTP calls easier: https://github.com/jnunemaker/httparty
+gem 'httparty'
+
 # Support for interaction with AWS resources
 gem 'aws-sdk-secretsmanager'
 

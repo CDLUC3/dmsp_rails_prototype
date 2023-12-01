@@ -1,11 +1,9 @@
 require 'aws-sdk-secretsmanager'
 
-puts ENV['RAILS_ENV']
-
 # Skip this if the environment is our local Docker dev container
-unless ENV['RAILS_ENV'] == 'docker'
+unless Rails.env.development?
   # Determine the env and then fetch the RDS secret
-  env = ENV['RAILS_ENV'] == 'production' ? 'prd' : (ENV['RAILS_ENV'] == 'stage' ? 'stg' : 'dev')
+  env = Rails.env.production? ? 'prd' : (Rails.env.staging? ? 'stg' : 'dev')
   secret_name = "dmp-hub-#{env}-rails-app"
   client = Aws::SecretsManager::Client.new(region: ENV.fetch('AWS_REGION', 'us-west-2'))
 
