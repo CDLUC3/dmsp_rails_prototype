@@ -1,0 +1,54 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "DynamoDB seed template for NoSQL Workbench",
+    "Resources": {
+        "DynamoTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "KeySchema": [
+                    {
+                        "AttributeName": "PK",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "SK",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "PK",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "SK",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "dmphub_modification_day",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "dmphub_provenance_identifier",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "dmproadmap_featured",
+                        "AttributeType": "S"
+                    }
+                ],
+                "StreamSpecification": {
+                    "StreamViewType": "NEW_IMAGE"
+                },
+                "BillingMode": "PAY_PER_REQUEST",
+                "TableClass": "STANDARD",
+                "ContributorInsightsSpecification": {
+                    "Enabled": false
+                },
+                "PointInTimeRecoverySpecification": {
+                    "PointInTimeRecoveryEnabled": false
+                }
+            }
+        }
+    }
+}

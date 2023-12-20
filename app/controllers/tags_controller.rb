@@ -4,9 +4,6 @@ class TagsController < ApplicationController
   # GET /tags
   def index
     @tags = Tag.all
-
-    @tags = [{ name: "Bllah Blaaaahhh Blahhhhh", description: "Yaaaadddddaaa Yadddaaaa Yada" }]
-
     render json: @tags
   end
 

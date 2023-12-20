@@ -1,26 +1,37 @@
 version: "2.3"
 
-volumes:
-  mysql:
-
 services:
-  mysql:
-    image: mysql/mysql-server:latest
-    restart: always
-    environment:
-      MYSQL_DATABASE: dmsp
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_USER: "${DATABASE_USERNAME}"
-      MYSQL_PASSWORD: "${DATABASE_PASSWORD}"
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dmsp-dynamodb-local
     ports:
-      - "3306:3306"
-    expose:
-      - "3306"
+      - "8001:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+
+  mysql:
+    restart: always
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    image: mysql/mysql-server:latest
+    container_name: dmsp-mysql-local
+    ports:
+      - "3307:3306"
+    expose:
+      - "3307"
+    environment:
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: "${DB_USER}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+    volumes:
+      - "./docker/mysql:/var/lib/mysql"
 
   app:
     depends_on:
       - mysql
+      - dynamodb-local
     build: .
     command: "bundle exec rails server -p 3000 -b '0.0.0.0'"
     volumes:
@@ -31,13 +42,15 @@ services:
       - "3001"
     links:
       - mysql
+      - "dynamodb-local"
     environment:
       RAILS_ENV: "docker"
       DB_HOST: mysql
       DB_PORT: "3306"
-      DB_NAME: "dmsp"
-      DB_USER: "${DATABASE_USERNAME}"
-      DB_PASSWORD: "${DATABASE_PASSWORD}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+
     # TODO: Monitor the compose watch project. It currently is not allowing sync. There is an open discussion
     #       here: https://github.com/docker/compose/issues/11102
     develop:

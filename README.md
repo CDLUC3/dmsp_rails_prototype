@@ -20,6 +20,19 @@ DATABASE_PASSWORD=[rails-app-password]
 
 To run DB migrations or other Rails/Rake scripts, you can run the following to connect to the container (in a separate terminal window): `docker-compose run app bash`
 
+
+## Development with Docker:
+There are probably much better ways to do these things, but this is what we have so far:
+
+Build the docker environment (local dynamodb, mysql and Rails app): `docker-compose up`
+
+For some reason the Rails app is starting before mysql has had a chance to finish starting up, so you have to manually start the app in the Docker desktop console once mysql is running.
+
+Hop into one of the images in the container: `docker-compose exec mysql bash`
+
+Tail the application logs: `docker exec app tail -f ./log/docker.log`
+
+
 ## Deploying
 
 The Github repository has a corresponding branch for each of the environments except `docker`. When code is merged into the appropriate branch, an AWS CodePipeline is triggered which will run any tests and then build the Docker image within the AWS environment using the `buildspec.yaml` file.
