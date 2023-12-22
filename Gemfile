@@ -41,8 +41,23 @@ gem "bootsnap", require: false
 # Gem to help make HTTP calls easier: https://github.com/jnunemaker/httparty
 gem 'httparty'
 
-# Support for interaction with AWS resources
-gem 'aws-sdk-secretsmanager'
+# This library is intended to provide Ruby with an interface for validating JSON objects against a JSON schema
+# conforming to JSON Schema Draft 6: https://github.com/voxpupuli/json-schema
+gem 'json-schema'
+
+group :aws do
+  # Support for interaction with AWS resources
+  gem 'aws-sdk-secretsmanager'
+
+  # DynamoDB adapter
+  gem 'aws-sdk-dynamodb'
+
+  # S3 Bcuket adapter
+  gem 'aws-sdk-s3'
+
+  # SSM parameter store adapter
+  gem 'aws-sdk-ssm'
+end
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

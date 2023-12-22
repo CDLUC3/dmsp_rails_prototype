@@ -3,6 +3,8 @@ Rails.application.routes.draw do
 
   resources :tags
 
+  resources :dmps
+
   # Cognito authentication tokens
   get "token", controller: :tokens_controller, action: :exchange_code_for_token
 

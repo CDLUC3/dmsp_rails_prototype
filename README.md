@@ -30,7 +30,7 @@ For some reason the Rails app is starting before mysql has had a chance to finis
 
 Hop into one of the images in the container: `docker-compose exec mysql bash`
 
-Tail the application logs: `docker exec app tail -f ./log/docker.log`
+Tail the application logs: `docker-compose exec app tail -f ./log/docker.log`
 
 
 ## Deploying
