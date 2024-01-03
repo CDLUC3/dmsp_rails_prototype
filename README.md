@@ -7,7 +7,15 @@ It comproses the "Fargate" portion of this system diagram
 
 ## Development with Docker:
 
+Prerequisites:
+- Docker >= version 20.10
+- Docker Compose >= version 2.23
+- MySQL >= version 8.2
+- [AWS NoSQL Workbench](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/workbench.settingup.html)
+
 The local Docker development environment uses the `docker-compose.yaml` file along with a `.env` file that contains all of the environment variable config required to run the application.
+
+Both the MySQL and DynamoDB databases are persisted between Docker container runs. The contents are stored in `docker/`. This directory is ignored by Git.
 
 You will first need to make a copy of the `.env.example` file, `cp .env.example .env`, and then update it for your local system.
 
