@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module NosqlAdapter
-  class NoSqlItemError < StandardError; end
+module Nosql
+  class ItemError < StandardError; end
 
   # A NoSQL item/record
   class Item
@@ -33,12 +33,12 @@ module NosqlAdapter
     #
     # All other entries in the :args Hash should be mapped onto the @metadata Hash
     def initialize(**args)
-      raise NoSqlItemError, MSG_NO_DMP_ID_FOR_NEW unless args[:dmp_id].nil?
+      raise ItemError, MSG_NO_DMP_ID_FOR_NEW unless args[:dmp_id].nil?
 
       @doi_base_url = ENV['DOI_BASE_URL']
       @doi_shoulder = ENV['DOI_SHOULDER']
-      raise NoSqlItemError, MSG_NO_DOI_BASE_URL if @doi_base_url.empty?
-      raise NoSqlItemError, MSG_NO_DOI_SHOULDER if @doi_shoulder.empty?
+      raise ItemError, MSG_NO_DOI_BASE_URL if @doi_base_url.empty?
+      raise ItemError, MSG_NO_DOI_SHOULDER if @doi_shoulder.empty?
 
       @versions = []
       @metadata = {}

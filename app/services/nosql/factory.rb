@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-module NosqlAdapter
+module Nosql
   # Factory to create the NoSQL database adapter
   class Factory
     def self.create_adapter(provider, args)
       case provider
       when :aws
-        NosqlAdapter::AwsDynamodbAdapter.new(**args)
+        Nosql::AwsDynamodbAdapter.new(**args)
       else
         raise ArgumentError, "Unsupported NoSQL database provider"
       end

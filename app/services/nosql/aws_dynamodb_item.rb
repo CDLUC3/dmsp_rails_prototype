@@ -2,7 +2,7 @@
 
 require 'securerandom'
 
-module NosqlAdapter
+module Nosql
   # A NoSQL item/record
   class AwsDynamodbItem < Item
     PARTITION_KEY_DMP_PREFIX = 'DMP#'.freeze
@@ -104,7 +104,7 @@ module NosqlAdapter
 
     # Generate a new NoSQL key from the value set in @dmp_id
     #
-    # @raise [NosqlAdapter::NoSqlItemError] If a new unique key could not be generated
+    # @raise [Nosql::ItemError] If a new unique key could not be generated
     # @return [Hash] The new key as `{ partition_key: 'foo', sort_key: 'bar' }`
     def _generate_key
       return @key if @key.is_a?(Hash) && !@key[:partion_key].empty?
@@ -117,7 +117,7 @@ module NosqlAdapter
         id = doi unless NOSQL_ADAPTER.exists?(key:)
         counter += 1
       end
-      raise NoSqlItemError, MSG_UNABLE_TO_ACQUIRE_NEW_ID if id.empty?
+      raise ItemError, MSG_UNABLE_TO_ACQUIRE_NEW_ID if id.empty?
 
       @key = { partion_key: key, sort_key: SORT_KEY_DMP_LATEST_VERSION }
       @dmp_id = _key_to_dmp_id
@@ -196,7 +196,7 @@ module NosqlAdapter
       # Remove the Dynamo partition key prefix, any web protocol and the base DOI URL
       id = key.gsub(PARTITION_KEY_DMP_PREFIX, '')
               .gsub(%r{https?://}, '')
-              .gsub(_dmp_id_base_url, '')
+              .gsub(@doi_base_url, '')
       # Remove beginning and trailing slashes
       id = id.start_with?('/') ? id[1..id.length] : id
       id.end_with?('/') ? id[0..id.length - 2] : id
@@ -211,7 +211,7 @@ module NosqlAdapter
 
       # First remove anything that is already there
       key = _remove_partition_key_prefixing(key:)
-      "#{PARTITION_KEY_DMP_PREFIX}#{_dmp_id_base_url}#{key}"
+      "#{PARTITION_KEY_DMP_PREFIX}#{@doi_base_url}#{key}"
     end
 
     # Remove the version from the sort key

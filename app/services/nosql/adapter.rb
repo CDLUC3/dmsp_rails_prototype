@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module NosqlAdapter
-  class NoSqlAdapterError < StandardError; end
+module Nosql
+  class NosqlError < StandardError; end
 
   # Singleton! Client adapter for the DynamoDB NoSQL table
   class Adapter
@@ -15,9 +15,9 @@ module NosqlAdapter
     #
     # @param [Hash] args The arguments you want to use to initialize the adapter
     # @option args [String] :table The table name
-    # @raise [NoSqlAdapterError] When a fatal error occurs
+    # @raise [NosqlError] When a fatal error occurs
     def initialize(**args)
-      raise NoSqlAdapterError, _handle_error(msg: MSG_MISSING_TABLE) if args[:table].nil?
+      raise NosqlError, _handle_error(msg: MSG_MISSING_TABLE) if args[:table].nil?
       @debug = Rails.logger.level == :debug
       @table = args[:table]
     end
@@ -27,7 +27,7 @@ module NosqlAdapter
     #
     # @param [Hash] key The key we want to check for (format varies by NoSQL database engine)
     # @return [boolean] Whether or not the key exists in the NoSQL database
-    # @raise [NoSqlAdapterError] When a fatal error occurs
+    # @raise [NosqlError] When a fatal error occurs
     def exists?(key:)
       raise NotImplementedError, "Subclasses must implement this method"
     end
@@ -36,8 +36,8 @@ module NosqlAdapter
     #
     # @param [Hash] key The key we want to check for (format varies by NoSQL database engine)
     # @param [Hash] args Arguments that will be passed on to the connection/client
-    # @return [NosqlAdapter::Item] The item (or nil)
-    # @raise [NoSqlAdapterError] When a fatal error occurs
+    # @return [Nosql::Item] The item (or nil)
+    # @raise [NosqlError] When a fatal error occurs
     def get(key:, args:)
       raise NotImplementedError, "Subclasses must implement this method"
     end
@@ -45,17 +45,17 @@ module NosqlAdapter
     # Search for records.
     #
     # @param args [Hash] Arguments that will be passed on to the connection/client
-    # @return [Array] an array of [NosqlAdapter::Item] (or an empty array)
-    # @raise [NoSqlAdapterError] When a fatal error occurs
+    # @return [Array] an array of [Nosql::Item] (or an empty array)
+    # @raise [NosqlError] When a fatal error occurs
     def query(args:)
       raise NotImplementedError, "Subclasses must implement this method"
     end
 
     # Create/Update a record
     #
-    # @param [NosqlAdapter::Item] item The item you want to create/update
+    # @param [Nosql::Item] item The item you want to create/update
     # @return [boolean] Whether or not the action was successful
-    # @raise [NoSqlAdapterError] When a fatal error occurs
+    # @raise [NosqlError] When a fatal error occurs
     def put(item:)
       raise NotImplementedError, "Subclasses must implement this method"
     end
@@ -64,7 +64,7 @@ module NosqlAdapter
     #
     # @param [Hash] key The key we want to check for (format varies by NoSQL database engine)
     # @return [boolean] Whether or not the action was successful
-    # @raise [NoSqlAdapterError] When a fatal error occurs
+    # @raise [NosqlError] When a fatal error occurs
     def delete(key:)
       raise NotImplementedError, "Subclasses must implement this method"
     end
@@ -79,9 +79,9 @@ module NosqlAdapter
     # be run anywhere else (hence placing it her in the `private` methods)
     #
     # @return [boolean] Whether or not the action was successful
-    # @raise [NoSqlItemError] When not in the local Docker development environment
+    # @raise [NosqlItemError] When not in the local Docker development environment
     def initialize_database
-      raise NoSqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.docker?
       raise NotImplementedError, "Subclasses must implement this method"
     end
 
@@ -89,9 +89,10 @@ module NosqlAdapter
     # environments and not encouraged, but necessary in certain scenarios. This is
     # invoked via the `rails nosql:purge_local` task.
     #
-    # @raise [NoSqlItemError] When not in the local Docker development environment
+    # @raise [NosqlItemError] When not in the local Docker development environment
     def purge_database
-      raise NoSqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.docker?
       raise NotImplementedError, "Subclasses must implement this method"
+    end
   end
 end

@@ -2,7 +2,7 @@
 
 require 'aws-sdk-dynamodb'
 
-module NosqlAdapter
+module Nosql
   # Singleton! Client adapter for the DynamoDB NoSQL table
   class AwsDynamodbAdapter < Adapter
     MSG_INVALID_ARGS = 'Invalid DynamoDB args. Expecting Hash!'.freeze
@@ -20,7 +20,7 @@ module NosqlAdapter
     # @option args [Number] :size (5) The number of connections for the pool (5 max)
     # @option args [Number] :timeout The connection timeout
     # @option args [Hash] :connection Arguments passed on to the connection during initialization
-    # @raise [NoSqlAdapterError] When an Aws::Errors::ServiceError occurs
+    # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def initialize(**args)
       super(**args)
 
@@ -32,7 +32,7 @@ module NosqlAdapter
       end
       Rails.logger.info("Connections established to DynamoDB table: #{@table}")
     rescue Aws::Errors::ServiceError => e
-      raise NoSqlAdapterError, _handle_error(msg: e.message, details: e.backtrace)
+      raise NosqlError, _handle_error(msg: e.message, details: e.backtrace)
     end
 
     # Check to see if the Partion+Sort key exists. This should attempt to just return
@@ -42,14 +42,14 @@ module NosqlAdapter
     # @option key [String] :PK The partition key (e.g. 'DMP#doi.org/11.22222/AB12CD34')
     # @option key [String] :SK The sort key (e.g. 'VERSION#latest')
     # @return [boolean] Whether or not the key exists in the NoSQL database
-    # @raise [NoSqlAdapterError] When an Aws::Errors::ServiceError occurs
+    # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def exists?(key:)
       return false unless key.is_a?(Hash) && !key.keys.empty?
 
       resp = get(key:, projection_expression: 'PK')
       resp.item.is_a?(Hash)
     rescue Aws::Errors::ServiceError => e
-      raise NoSqlAdapterError, _handle_error(msg: e.message, details: e.backtrace)
+      raise NosqlError, _handle_error(msg: e.message, details: e.backtrace)
     end
 
     # Fetch a specific record
@@ -59,9 +59,9 @@ module NosqlAdapter
     # @option key [String] :SK The sort key (e.g. 'VERSION#latest')
     # @param [Hash] args Arguments that will be passed on to the connection/client
     # @return [Hash] The item (or nil)
-    # @raise [NoSqlAdapterError] When an Aws::Errors::ServiceError occurs
+    # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def get(key:, **args)
-      raise NoSqlAdapterError, MSG_INVALID_KEY unless key.is_a?(Hash) && !key.keys.empty?
+      raise NosqlError, MSG_INVALID_KEY unless key.is_a?(Hash) && !key.keys.empty?
 
       opts = {
         table_name: @table,
@@ -78,14 +78,14 @@ module NosqlAdapter
         _response_to_item(resp:)&.first
       end
     rescue Aws::Errors::ServiceError => e
-      raise NoSqlAdapterError, _handle_error(msg: e.message, details: e.backtrace)
+      raise NosqlError, _handle_error(msg: e.message, details: e.backtrace)
     end
 
     # Search for records.
     #
     # @param [Hash] args Arguments that will be passed on to the connection/client
-    # @return [Array] an array of [NosqlAdapter::Item] (or an empty array)
-    # @raise [NoSqlAdapterError] When an Aws::Errors::ServiceError occurs
+    # @return [Array] an array of [Nosql::Item] (or an empty array)
+    # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def query(**args)
 
       # TODO: Swap this out, this is just for testing. We want to use OpenSearch anyway
@@ -94,7 +94,7 @@ module NosqlAdapter
         return _response_to_items(resp:)
       end
 
-      raise NoSqlAdapterError, MSG_INVALID_ARGS unless args.is_a?(Hash) &&
+      raise NosqlError, MSG_INVALID_ARGS unless args.is_a?(Hash) &&
                                                 args.fetch(:key_conditions, {}).any?
 
       hash = {
@@ -121,16 +121,16 @@ module NosqlAdapter
         _response_to_items(resp:)
       end
     rescue Aws::Errors::ServiceError => e
-      raise NoSqlAdapterError, _handle_error(msg: e.message, details: e.backtrace)
+      raise NosqlError, _handle_error(msg: e.message, details: e.backtrace)
     end
 
     # Create/Update a record
     #
-    # @param [NosqlAdapter::Item] item The item you want to create/update
+    # @param [Nosql::Item] item The item you want to create/update
     # @return [boolean] Whether or not the action was successful
-    # @raise [NoSqlAdapterError] When an Aws::Errors::ServiceError occurs
+    # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def put(item:)
-      raise NoSqlAdapterError, MSG_INVALID_ITEM unless item.is_a?(NosqlAdapter::AwsDynamodbItem)
+      raise NosqlError, MSG_INVALID_ITEM unless item.is_a?(Nosql::AwsDynamodbItem)
 
       @client_pool.with do |client|
         Rails.logger.info("DynamoDB Put item: #{item.key}")
@@ -145,7 +145,7 @@ module NosqlAdapter
       # TODO: How do we test for success?
       true
     rescue Aws::Errors::ServiceError => e
-      raise NoSqlAdapterError, _handle_error(msg: e.message, details: e.backtrace)
+      raise NosqlError, _handle_error(msg: e.message, details: e.backtrace)
     end
 
     # Delete a record
@@ -154,9 +154,9 @@ module NosqlAdapter
     # @option key [String] :PK The partition key (e.g. 'DMP#doi.org/11.22222/AB12CD34')
     # @option key [String] :SK The sort key (e.g. 'VERSION#latest')
     # @return [boolean] Whether or not the action was successful
-    # @raise [NoSqlAdapterError] When an Aws::Errors::ServiceError occurs
+    # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def delete(key:)
-      raise NoSqlAdapterError, MSG_INVALID_KEY unless key.is_a?(Hash) && !key.keys.empty?
+      raise NosqlError, MSG_INVALID_KEY unless key.is_a?(Hash) && !key.keys.empty?
 
       @client_pool.with do |client|
         Rails.logger.info("DynamoDB Delete item: #{key}")
@@ -173,7 +173,7 @@ module NosqlAdapter
     # Convert the DynamoDB items into NosqlItems
     #
     # @param [Seahorse::Client::Response] resp The response from the Aws::DyanmoDB::Client
-    # @return [Array<NosqlAdapter::Item>] An array of NoSQL items (e.g. Dmps)
+    # @return [Array<Nosql::Item>] An array of NoSQL items (e.g. Dmps)
     def _response_to_items(resp:)
       out = []
       if resp.respond_to?(:item)
@@ -210,9 +210,9 @@ module NosqlAdapter
     # be run anywhere else (hence placing it her in the `private` methods)
     #
     # @return [boolean] Whether or not the action was successful
-    # @raise [NoSqlItemError] When not in the local Docker development environment
+    # @raise [NosqlItemError] When not in the local Docker development environment
     def initialize_database
-      raise NoSqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.docker?
 
       resp = @client_pool.with do |client|
         puts "Checking to see if the NoSQL table #{@table} exists ..."
@@ -248,9 +248,9 @@ module NosqlAdapter
     # environments and not encouraged, but necessary in certain scenarios. This is
     # invoked via the `rails nosql:purge_local` task.
     #
-    # @raise [NoSqlItemError] When not in the local Docker development environment
+    # @raise [NosqlItemError] When not in the local Docker development environment
     def purge_database
-      raise NoSqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.docker?
 
       puts 'Gathering DMP ID records from the local DyanmoDB'
       @client_pool.with do |client|

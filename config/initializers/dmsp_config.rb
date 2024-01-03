@@ -11,7 +11,7 @@ Rails.application.config.after_initialize do
   #   2. Add your new adapter to the app/services/nosql_adapter/factory.rb
   #   3. Update this file to use your new classes.
   #
-  NOSQL_ITEM_CLASS = NosqlAdapter::AwsDynamodbItem
+  NOSQL_ITEM_CLASS = Nosql::AwsDynamodbItem
 
   # If we are running in the local Docker development environment
   if Rails.env.docker?
@@ -25,11 +25,8 @@ Rails.application.config.after_initialize do
         credentials: Aws::Credentials.new(ENV['NOSQL_ACCESS_KEY'], ENV['NOSQL_ACCESS_SECRET'])
       }
     }
-
-puts nosql_args
-
     # Use AWS as the Cloud Provider here so that it uses the local AWS NoSQL Workbench
-    NOSQL_ADAPTER = NosqlAdapter::Factory.create_adapter(:aws, nosql_args)
+    NOSQL_ADAPTER = Nosql::Factory.create_adapter(:aws, nosql_args)
   else
     # Fetch the Cloud Provider
     cloud_provider = ENV['CLOUD_PROVIDER']&.downcase&.to_sym
@@ -48,7 +45,7 @@ puts nosql_args
         timeout: ENV.fetch('NOSQL_TIMEOUT', 5),
         connection: { region: }
       }
-      NOSQL_ADAPTER = NosqlAdapter::Factory.create_adapter(cloud_provider, nosql_args)
+      NOSQL_ADAPTER = Nosql::Factory.create_adapter(cloud_provider, nosql_args)
     end
   end
 end
