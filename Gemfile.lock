@@ -233,6 +233,7 @@ DEPENDENCIES
   aws-sdk-secretsmanager
   aws-sdk-ssm
   bootsnap
+  connection_pool
   debug
   httparty
   json-schema

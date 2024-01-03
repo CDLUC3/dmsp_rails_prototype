@@ -38,6 +38,12 @@ gem "bootsnap", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
+# Generic connection pooling for Ruby.
+# MongoDB has its own connection pool. ActiveRecord has its own connection pool. This is a
+# generic connection pool that can be used with anything, e.g. Redis, Dalli etc.
+#   https://github.com/mperham/connection_pool
+gem 'connection_pool'
+
 # Gem to help make HTTP calls easier: https://github.com/jnunemaker/httparty
 gem 'httparty'
 
