@@ -16,21 +16,35 @@ module NosqlAdapter
 
     attr_reader :landing_page_url, :extras
 
+    # Initialize a new NosqlItem with either an RDA Common Standard JSON Hash or a NoSQL
+    # JSON Hash.
+    #   - If no :PK or :dmp_id is provided, a @key and @dmp_id will be generated
+    #   - If a :PK is provided, that :PK will be used as the @key and @dmp_id
+    #   - If a :dmp_id is provided and no :PK is provided, it will be used as the @key and @dmp_id
+    #
+    # Additional entries in :args are handled as follows:
+    #   - :dmphub_versions are parsed and their :timestamp used to populate the @versions Array
+    #   - :dmphub_modifications are moved as is into the @modifications Array
+    #   - Other :dmphub_ prefixed entries are placed into the @extras Hash
+    #   - All other entries are placed into the @metadata Hash
+    #
+    # @param [Hash] args Initialization parameters
+    # @option [String] :PK The partition key (otpional)
+    # @option [String] :SK The sort key (optional)
+    # @option [Hash] :dmp_id The DMP ID (optional) (e.g. `{ "type": "doi", "identifier": "foo" }`)
     def initialize(**args)
-      super(**args)
-
       @extras = {}
       # Set the default landing page URL
       host = Rails.configuration.action_mailer.default_url_options[:host]
-      @landing_page_url = Rails.application.routes.url_helpers.dmps_url(@dmp_id, host:)
 
-      # Parse the incoming JSON Hash
-      _from_nosql_hash(hash: args)
+      super(**args)
+
+      @landing_page_url = Rails.application.routes.url_helpers.dmps_url(@dmp_id, host:)
     end
 
     # Convert the NoSQL item into a JSON record for the NoSQL database
     #
-    # @return [Hash] The item represented as a Hash that is ready for the NoSQL database
+    # @return [Hash] The item represented as JSON Hash (with all the NoSQL stuff)
     def to_nosql_hash
       hash = @metadata
 
@@ -45,6 +59,8 @@ module NosqlAdapter
     end
 
     # Convert this object to the RDA Common Standard JSON format for use in the UI or API
+    #
+    # @return [Hash] This Item represented as JSON Hash (without all of the NoSQL specific stuff)
     def to_json
       hash = @metadata
       hash['dmp_id'] = { type: 'doi', identifier: "#{@doi_base_url}#{@dmp_id}" }
@@ -53,11 +69,10 @@ module NosqlAdapter
 
     private
 
-    # Convert the raw NoSQL record into this item
+    # Convert the raw NoSQL record into the attributes for this Item
     #
-    # @param hash [Hash] The NoSQL record as a Hash
-    # @return item [NosqlAdapter::AwsDynamodbItem] An instance of this class
-    def _from_nosql_hash(hash:)
+    # @param [Hash] The NoSQL record as a Hash
+    def _from_hash(hash:)
       args = { key: {}, metadata: {}, versions: [], modifications: [], extras: [] }
 
       # Parse out the incoming Hash into DMP parts
@@ -89,7 +104,8 @@ module NosqlAdapter
 
     # Generate a new NoSQL key from the value set in @dmp_id
     #
-    # @return [NosqlAdapter::Key] The
+    # @raise [NosqlAdapter::NoSqlItemError] If a new unique key could not be generated
+    # @return [Hash] The new key as `{ partition_key: 'foo', sort_key: 'bar' }`
     def _generate_key
       return @key if @key.is_a?(Hash) && !@key[:partion_key].empty?
 
@@ -105,9 +121,17 @@ module NosqlAdapter
 
       @key = { partion_key: key, sort_key: SORT_KEY_DMP_LATEST_VERSION }
       @dmp_id = _key_to_dmp_id
+      @key
     end
 
     # Extract the @key and @dmp_id from the incoming Hash
+    #
+    # @param [Hash] args The NoSQL record (either the PK or dmp_id is required)
+    # @option args [String] :PK The partition key
+    # @option args [String] :SK The sort key (optional)
+    # @option args [Hash] :dmp_id The DMP ID (e.g. `{ "type": "doi", "identifier": "foo" }`)
+    # @option args [String] :modified The last modification date/time
+    # @return [boolean] Whether or not the call was successful
     def _identifiers_from_hash(**args)
       return false unless args.is_a?(Hash) && (!args['PK'].nil? || !args['dmp_id'].nil?)
       return true if @key.is_a?(Hash) && !@key[:partion_key].empty?
@@ -140,9 +164,9 @@ module NosqlAdapter
 
     # Convert the DMP ID into a partion key and the Version into a sort key
     #
-    # @param dmp_id [String] The DMP ID
-    # @param version [String] The version identifier (default: nil)
-    # @return key [Hash] The partition and sort key
+    # @param [String] dmp_id The DMP ID
+    # @param [String] version The version identifier (default: nil)
+    # @return [Hash] The partition and sort key
     def _dmp_id_and_version_to_key(dmp_id:, version: nil)
       p_key = self._append_partition_key_prefixing(key: dmp_id)
       s_key = version.nil? SORT_KEY_DMP_LATEST_VERSION
@@ -151,6 +175,8 @@ module NosqlAdapter
     end
 
     # Convert the verions array back to the format needed for the NoSQL record
+    #
+    # @return [Array<Hash>] An array of available versions
     def _versions_for_nosql
       @versions.map do |version|
         {
@@ -162,7 +188,7 @@ module NosqlAdapter
 
     # Extract the DMP ID from the partition key
     #
-    # @param key [String] A partition key
+    # @param [String] key A partition key
     # @return [String] A DMP ID
     def _remove_partition_key_prefixing(key:)
       return nil unless key.is_a?(String)
@@ -178,7 +204,7 @@ module NosqlAdapter
 
     # Append the partition key prefix to the DMP ID
     #
-    # @param key [String] A DMP ID
+    # @param [String] key A DMP ID
     # @return [String] A partition key
     def _append_partition_key_prefixing(key:)
       return nil unless key.is_a?(String)
@@ -190,7 +216,7 @@ module NosqlAdapter
 
     # Remove the version from the sort key
     #
-    # @param key [String] A sort key
+    # @param [String] key A sort key
     # @return [String] The version
     def _remove_sort_key_prefixing(key:)
       return SORT_KEY_DMP_LATEST_VERSION if key.nil? || key == SORT_KEY_DMP_LATEST_VERSION
@@ -200,7 +226,7 @@ module NosqlAdapter
 
     # Add the sort key prefix to the version
     #
-    # @param key [String] The version
+    # @param [String] key The version
     # @return [String] The sort key
     def _append_sort_key_prefix(key:)
       # Firts remove anything that is already there

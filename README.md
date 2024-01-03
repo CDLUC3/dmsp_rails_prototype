@@ -22,16 +22,26 @@ To run DB migrations or other Rails/Rake scripts, you can run the following to c
 
 
 ## Development with Docker:
-There are probably much better ways to do these things, but this is what we have so far:
 
-Build the docker environment (local dynamodb, mysql and Rails app): `docker-compose up`
+The local Docker development environment uses the `docker-compose.yaml` file along with a `.env` file that contains all of the environment variable config required to run the application.
 
-For some reason the Rails app is starting before mysql has had a chance to finish starting up, so you have to manually start the app in the Docker desktop console once mysql is running.
+You will first need to make a copy of the `.env.example` file, `cp .env.example .env`, and then update it for your local system.
+
+Once the `.env` file is in place you can build the docker environment (local dynamodb, mysql and Rails app) by running: `docker-compose up`
+
+This will create a small local network running the 2 databases and the Rails application. It uses the `Dockerfile` which runs the `bin/docker-entrypoint` file to initialize the MySQL and NoSQL databases (if necessary) on startup.
+
+**TODO:** For some reason the Rails app is starting before mysql has had a chance to finish starting up, so you have to manually start the app in the Docker desktop console once mysql is running.
+
+Once the system is up and running, you can interact with it on port 8001. For example: `curl -v http://localhost:8001/tags`
+
+### Other helpful commands for the local Docker development environment
 
 Hop into one of the images in the container: `docker-compose exec mysql bash`
 
 Tail the application logs: `docker-compose exec app tail -f ./log/docker.log`
 
+Purge all records from the local NoSQL database: `docker-compose exec app bin/rails nosql:purge`
 
 ## Deploying
 

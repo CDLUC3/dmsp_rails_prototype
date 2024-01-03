@@ -46,7 +46,7 @@ class Dmp < NOSQL_ITEM_CLASS
     # return false unless valid?
 
     Rails.logger.debug("Pre-Save: #{inspect}")
-    NOSQL_ADAPTER.put(key: @key, item: self)
+    NOSQL_ADAPTER.put(item: self)
   end
 
   # Delete (or Tombstone if registered) a DMP ID

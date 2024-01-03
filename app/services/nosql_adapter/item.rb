@@ -14,17 +14,24 @@ module NosqlAdapter
     attr_accessor :metadata
 
     # Generic initializer. The initializer of the classes that inherit from this class
-    # should call `super(**args` first and then parse the `args` to define the contents
-    # of:
-    #  @key      [Hash] - specific to the key requirements of the NoSQL database
-    #  @dmp_id   [Hash] - e.g. `{ type: 'doi', identifier: '11.22222/AB12CD34' }`
-    #  @versions [Array of UTC timestamps as Strings] - e.g. '2023-12-28T09:13:42+00:00'
-    #  @metadata [Hash] - e.g. `{ title: 'My DMP' }`
+    # should call `super(**args)` first and then parse the :args to define the contents
     #
-    # There are 3 scenarios in which the initializer is called:
-    #   1: A request to create a new Item (no @key or @dmp_id defined)
-    #   2: A fetch by @key from the NoSQL database
-    #   3: A fetch by @dmp_id from the NoSQL database
+    # The :args may contain a :dmp_id entry that conforms to the RDA Common Standard JSON
+    # (e.g. `{ "type": "doi", "identifier": "foo" }`) which should be used to set the @key
+    # and @dmp_id.
+    #
+    # If no :PK or :dmp_id are provided in the :args, then the subclass should generate
+    # a new @key and @dmp_id.
+    #
+    # It is also possible for the :args to contain the :key information if this is called
+    # from a function that queries the NoSQL database. If that is the case, it should be
+    # used to set the @key and @dmp_id
+    #
+    # The subclass is also responsible for mapping the :args entries to the @versions Array
+    # which should contain a sorted (descending) list of timestamps (typically based on the
+    # record's modification date).
+    #
+    # All other entries in the :args Hash should be mapped onto the @metadata Hash
     def initialize(**args)
       raise NoSqlItemError, MSG_NO_DMP_ID_FOR_NEW unless args[:dmp_id].nil?
 
@@ -36,69 +43,32 @@ module NosqlAdapter
       @versions = []
       @metadata = {}
       @errors = []
-    end
 
-    class << self
-      # Convert the DMP ID and version into a NoSQL key
-      #
-      # @param dmp_id [String] The DMP ID
-      # @param version [String] The version identifier (default: nil)
-      # @return [NosqlAdapter::Key] The NoSQL key
-      def key_from_dmp_id(dmp_id:, version: nil)
-        raise NotImplementedError, "Subclasses must implement this method"
-      end
-
-      # Convert the NoSQL key into the DMP ID
-      #
-      # @param key [NosqlAdapter::Key]
-      # @returns [Hash] A hash containing the :dmp_id and :version
-      def key_to_dmp_id_and_version(key:)
-        raise NotImplementedError, "Subclasses must implement this method"
-      end
+      # Parse the incoming args and map them to the appropriate attributes
+      _from_hash(hash: args)
     end
 
     # Convert the NoSQL item into a JSON record for the NoSQL database
     #
-    # @return [Hash] The item represented as a Hash that is ready for the NoSQL database
+    # @return [Hash] The item represented as JSON Hash (with all the NoSQL stuff)
     def to_nosql_hash
+      raise NotImplementedError, "Subclasses must implement this method"
+    end
+
+    # Convert this object to the RDA Common Standard JSON format for use in the UI or API
+    #
+    # @return [Hash] This Item represented as JSON Hash (without all of the NoSQL specific stuff)
+    def to_json
       raise NotImplementedError, "Subclasses must implement this method"
     end
 
     private
 
-    class << self
-      # Convert the raw NoSQL record into this item
-      #
-      # @param hash [Hash] The NoSQL record as a Hash
-      # @return item [NosqlAdapter::Item] An instance of this class
-      def _from_nosql_hash(hash:)
-        raise NotImplementedError, "Subclasses must implement this method"
-      end
-    end
-
-    # Generate a new NoSQL key
+    # Convert the raw NoSQL record into the attributes for this Item
     #
-    # @return [NosqlAdapter::Key] The
-    def _generate_key
+    # @param [Hash] The NoSQL record as a Hash
+    def _from_hash(hash:)
       raise NotImplementedError, "Subclasses must implement this method"
     end
-
-    # Generate a new DMP ID
-    #
-    # @return [String] The new DMP ID
-    def _generate_dmp_id
-      raise NotImplementedError, "Subclasses must implement this method"
-    end
-
-    # Return the base URL for a DMP ID
-    #
-    # @param include_protocol [boolean] Whether or not to include the HTTP protocol (default: false)
-    # @return [String]
-    def _dmp_id_base_url(include_protocol: false)
-      url = ENV.fetch('DOI_BASE_URL', 'http://localhost:3001')
-      url = url.gsub(%r{https?://}, '') unless include_protocol
-      url&.end_with?('/') ? url : "#{url}/"
-    end
-
   end
 end
