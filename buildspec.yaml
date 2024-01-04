@@ -16,7 +16,7 @@ phases:
       - export AWS_VERSION=$(aws --version)
 
       # Display some info about the build environment
-      - echo "CDLUC3/dmsp_prototype dir -- ${CODEBUILD_SRC_DIR}"
+      - echo "CDLUC3/dmsp_rails_prototype dir -- ${CODEBUILD_SRC_DIR}"
 
       # Fetch the ECR repository name
       - echo $ECR_REPOSITORY_URI >> .ecr

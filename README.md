@@ -45,7 +45,7 @@ The Github repository has a corresponding branch for each of the environments ex
 
 The new image will then be picked up by AWS Fargate and deployed.
 
-See the [dmp-hub-cfn repository](https://github.com/CDLUC3/dmp-hub-cfn) for the CodePipeline and CodeBuild defnitions
+See the [dmsp_aws_prototype repository](https://github.com/CDLUC3/dmsp_aws_prototype_) for the CodePipeline and CodeBuild defnitions
 
 ## Using another cloud provider
 
