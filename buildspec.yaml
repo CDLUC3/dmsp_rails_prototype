@@ -23,13 +23,13 @@ phases:
       - export SHORT_ECR_URI=$(awk '{gsub("$ECR_REPOSITORY_NAME", "");print}' .ecr)
       - rm .ecr
 
-      # Build the Rails credentials
-      # - echo $CREDENTIALS_ENC >> docker/credentials.yml.enc
-      # - cat docker/credentials.yml.enc
+      # Checkout the specified branch and run the tests
+      - cd CODEBUILD_SRC_DIR && git checkout $GIT_BRANCH
+      - echo Running RSpec tests ...
+      - bin/rails test
 
       # Set the repository URI to your ECR image and add an image tag with the first seven characters of the Git commit ID of the source.
       - echo Logging in to Amazon ECR ...
-      - cd $CODEBUILD_SRC_DIR
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $SHORT_ECR_URI
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
