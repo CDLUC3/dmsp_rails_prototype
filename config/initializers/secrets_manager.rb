@@ -8,6 +8,7 @@ unless Rails.env.docker?
   client = Aws::SecretsManager::Client.new(region: ENV.fetch('AWS_REGION', 'us-west-2'))
 
   begin
+    puts "Fetching DB Secret: #{secret_name}"
     get_secret_value_response = client.get_secret_value(secret_id: secret_name)
   rescue Aws::SecretsManager::Errors::DecryptionFailure => e
     raise
@@ -20,9 +21,14 @@ unless Rails.env.docker?
   rescue Aws::SecretsManager::Errors::ResourceNotFoundException => e
     raise
   else
+
+    puts get_secret_value_response.inspect
+
     if get_secret_value_response.secret_string
       secret_json = get_secret_value_response.secret_string
       secret_hash = JSON.parse(secret_json)
+
+      puts secret_hash
 
       ENV['DATABASE_HOST'] = secret_hash['host']
       ENV['DATABASE_PORT'] = secret_hash['port']
