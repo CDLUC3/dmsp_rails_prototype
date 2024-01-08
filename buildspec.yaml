@@ -28,19 +28,17 @@ phases:
       - echo Bundling application ...
       - bundle install
 
-      # Stub out Rails credentials for the test environment
-      - echo Setting up Railscredentials ...
-      - EDITOR='echo "$(cat config/credentials.yml.example)" >' bundle exec rails credentials:edit -e test
+      # Build out a DotEnv file for the container based on the ENV variables
+      - touch .env
+      - echo "REGION=$AWS_REGION" > .foo
 
+      # TODO: Undo these test lines once we have figured out we want to manage tests.
+      #       All tests should pas though before continuing!
+      #       We can use sqlite in place of RDS but will need to stub out a
+      #       mock Dynamo Client or install the NoSQL workbench
       # Run the tests
       # - echo Running RSpec tests ...
       # - bin/rails test
-
-      # TODO: Determine how we want to handle testing. Do we want to allow access to the
-      #       RDS instance and Dynamo? If so, we need to run this CodeBuild instance in
-      #       the VPC and provide it acces to the RDS SecGrp.
-      #       If not, We could use sqlite in place of RDS but will need to stub out a
-      #       mock Dynamo Client or install the NoSQL workbench
 
       # Set the repository URI to your ECR image and add an image tag with the first seven characters of the Git commit ID of the source.
       - echo Logging in to Amazon ECR ...
@@ -52,7 +50,7 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...
       - cd $CODEBUILD_SRC_DIR
-      - docker build -t $SHORT_ECR_URI:latest .
+      - docker build -f Dockerfile.aws -t $SHORT_ECR_URI:latest .
       - docker tag $ECR_REPOSITORY_URI:latest $SHORT_ECR_URI:$IMAGE_TAG
   post_build:
     commands:

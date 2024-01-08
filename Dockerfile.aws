@@ -48,11 +48,6 @@ RUN useradd rails --create-home --shell /bin/bash && \
     chown -R rails:rails db log storage tmp config
 USER rails:rails
 
-# Build a discardable master.key and credentials.yml.enc file for docker deployment
-RUN rm -rf config/credentials.yml.enc && \
-    rm -rf config/master.key && \
-    EDITOR=nano bundle exec rails credentials:edit
-
 # Entrypoint prepares the database and fetches any necessary SSM params.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
