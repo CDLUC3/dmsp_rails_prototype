@@ -24,7 +24,7 @@ phases:
       - rm .ecr
 
       # Checkout the specified branch and run the tests
-      - cd CODEBUILD_SRC_DIR && git checkout $GIT_BRANCH
+      - cd $CODEBUILD_SRC_DIR && git checkout $GIT_BRANCH
       - echo Running RSpec tests ...
       - bin/rails test
 
