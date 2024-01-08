@@ -29,13 +29,18 @@ phases:
       - bundle install
 
       # Stub out Rails credentials for the test environment
-      # Stub out the Rails credentials file so that we can start the Rails app
       - echo Setting up Railscredentials ...
       - EDITOR='echo "$(cat config/credentials.yml.example)" >' bundle exec rails credentials:edit -e test
 
       # Run the tests
-      - echo Running RSpec tests ...
-      - bin/rails test
+      # - echo Running RSpec tests ...
+      # - bin/rails test
+
+      # TODO: Determine how we want to handle testing. Do we want to allow access to the
+      #       RDS instance and Dynamo? If so, we need to run this CodeBuild instance in
+      #       the VPC and provide it acces to the RDS SecGrp.
+      #       If not, We could use sqlite in place of RDS but will need to stub out a
+      #       mock Dynamo Client or install the NoSQL workbench
 
       # Set the repository URI to your ECR image and add an image tag with the first seven characters of the Git commit ID of the source.
       - echo Logging in to Amazon ECR ...
