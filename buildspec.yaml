@@ -25,10 +25,10 @@ phases:
 
       # Checkout the specified branch and run the tests
       - cd $CODEBUILD_SRC_DIR
-      - echo $(git --version)
-      - echo $(git rev-parse --short HEAD)
-      - echo "Git Branch should be - '${GIT_BRANCH}'"
-      - git fetch origin $GIT_BRANCH && git checkout $GIT_BRANCH
+      # - echo $(git --version)
+      # - echo $(git rev-parse --short HEAD)
+      # - echo "Git Branch should be - '${GIT_BRANCH}'"
+      # - git fetch origin $GIT_BRANCH && git checkout $GIT_BRANCH
       - echo Running RSpec tests ...
       - bin/rails test
 
