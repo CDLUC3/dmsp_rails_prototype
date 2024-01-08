@@ -23,10 +23,17 @@ phases:
       - export SHORT_ECR_URI=$(awk '{gsub("$ECR_REPOSITORY_NAME", "");print}' .ecr)
       - rm .ecr
 
-      # Checkout the specified branch and run the tests
+      # Install the dependencies
       - cd $CODEBUILD_SRC_DIR
       - echo Bundling application ...
       - bundle install
+
+      # Stub out Rails credentials for the test environment
+      # Stub out the Rails credentials file so that we can start the Rails app
+      - echo Setting up Railscredentials ...
+      - EDITOR='echo "$(cat config/credentials.yml.example)" >' bundle exec rails credentials:edit -e test
+
+      # Run the tests
       - echo Running RSpec tests ...
       - bin/rails test
 
