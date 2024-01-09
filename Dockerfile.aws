@@ -21,6 +21,7 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
+RUN bundle config set --local without test development
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
@@ -54,6 +55,6 @@ USER rails:rails
 #   3306 - database server
 EXPOSE 25 80 443 3306
 
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+ENTRYPOINT ["bin/docker-entrypoint"]
 
-CMD ["bin/puma", "-C", "config/puma.rb", "-p", "80"]
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-p", "80"]
