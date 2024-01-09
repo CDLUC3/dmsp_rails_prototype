@@ -23,19 +23,16 @@ phases:
       - export SHORT_ECR_URI=$(awk '{gsub("$ECR_REPOSITORY_NAME", "");print}' .ecr)
       - rm .ecr
 
-      # Install the dependencies
-      - cd $CODEBUILD_SRC_DIR
-      - echo Bundling application ...
-      - bundle install
-
-      # Build out a DotEnv file for the container based on the ENV variables
-      - touch .env
-      - echo "REGION=$AWS_REGION" > .foo
-
-      # TODO: Undo these test lines once we have figured out we want to manage tests.
+      # TODO: Undo these bundle and test lines once we have figured out we want to manage tests.
       #       All tests should pas though before continuing!
       #       We can use sqlite in place of RDS but will need to stub out a
       #       mock Dynamo Client or install the NoSQL workbench
+
+      # Install the dependencies
+      # - cd $CODEBUILD_SRC_DIR
+      # - echo Bundling application ...
+      # - bundle install
+
       # Run the tests
       # - echo Running RSpec tests ...
       # - bin/rails test
