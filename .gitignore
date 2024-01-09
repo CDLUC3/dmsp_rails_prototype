@@ -43,3 +43,9 @@
 .DS_Store
 
 /config/credentials/development.key
+
+/config/credentials/docker.key
+
+/config/credentials/staging.key
+
+/config/credentials/production.key

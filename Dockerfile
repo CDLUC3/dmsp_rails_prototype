@@ -50,7 +50,7 @@ USER rails:rails
 # Build a discardable master.key and credentials.yml.enc file for docker deployment
 RUN rm -rf config/credentials.yml.enc && \
     rm -rf config/master.key && \
-    EDITOR=nano bundle exec rails credentials:edit
+    EDITOR=nano bundle exec rails credentials:edit -e docker
 
 # Entrypoint prepares the database and fetches any necessary SSM params.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
