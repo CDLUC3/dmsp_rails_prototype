@@ -48,14 +48,12 @@ RUN useradd rails --create-home --shell /bin/bash && \
     chown -R rails:rails db log storage tmp config
 USER rails:rails
 
-# Run any pending DB migrations
-RUN bin/rails db:migrate
-
 # expose correct ports
 #   25 - email server
 #   80 and 443 - HTTP traffic
 #   3306 - database server
 EXPOSE 25 80 443 3306
 
-# The Docker command is handled by the docker-compose file
+ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+
 CMD ["bin/puma", "-C", "config/puma.rb", "-p", "80"]
