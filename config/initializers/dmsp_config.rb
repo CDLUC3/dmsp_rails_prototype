@@ -3,7 +3,7 @@
 # NOTE: This runs after Rails has finished initializing and after the other initializers have run!
 #
 # Environment specific configuration
-Rails.application.config.after_initialize do
+#Rails.application.config.after_initialize do
 
   # We are using AWS DynamoDB. If you want to use a different Cloud provider, you
   # will need to:
@@ -48,4 +48,4 @@ Rails.application.config.after_initialize do
       NOSQL_ADAPTER = Nosql::Factory.create_adapter(cloud_provider, nosql_args)
     end
   end
-end
+# end
