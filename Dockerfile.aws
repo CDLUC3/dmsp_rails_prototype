@@ -51,9 +51,9 @@ USER rails:rails
 
 # expose correct ports
 #   25 - email server
-#   80 and 443 - HTTP traffic
+#   80 - load balancer
 #   3306 - database server
-EXPOSE 25 80 443 3306
+EXPOSE 25 80 3306
 
 ENTRYPOINT ["bin/docker-entrypoint"]
 
