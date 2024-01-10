@@ -23,6 +23,9 @@ unless Rails.env.docker?
     if get_secret_value_response.secret_string
       secret_json = get_secret_value_response.secret_string
       secret_hash = JSON.parse(secret_json)
+
+pp secret_hash
+
       ENV['DATABASE_HOST'] = secret_hash['host']
       ENV['DATABASE_PORT'] = secret_hash['port']
       ENV['DATABASE_USERNAME'] = secret_hash['username']

@@ -57,4 +57,6 @@ EXPOSE 25 80 3306
 
 ENTRYPOINT ["bin/docker-entrypoint"]
 
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-p", "80"]
+# CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-p", "80"]
+
+CMD ["bin/rails", "s", "-p", "80"]
