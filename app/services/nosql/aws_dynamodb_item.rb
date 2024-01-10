@@ -114,7 +114,7 @@ module Nosql
       while id == '' && counter <= 10
         doi = "#{@doi_shoulder}#{SecureRandom.hex(2).upcase}#{SecureRandom.hex(2)}"
         key = self._append_partition_key_prefixing(key: doi)
-        id = doi unless NOSQL_ADAPTER.exists?(key:)
+        id = doi unless @adapter.exists?(key:)
         counter += 1
       end
       raise ItemError, MSG_UNABLE_TO_ACQUIRE_NEW_ID if id.empty?

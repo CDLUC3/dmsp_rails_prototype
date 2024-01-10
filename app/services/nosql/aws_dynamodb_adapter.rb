@@ -22,13 +22,17 @@ module Nosql
     # @option args [Hash] :connection Arguments passed on to the connection during initialization
     # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def initialize(**args)
+      @debug = Rails.logger.level == :debug
+      @table = ENV.fetch('NOSQL_TABLE', 'dmsp-local')
+      raise NosqlError, _handle_error(msg: MSG_MISSING_TABLE) if args[:table].nil?
+
       super(**args)
 
-      size = args.fetch(:size, 5)
-      timeout = args.fetch(timeout, 5)
-      conn_args = args.fetch(:connection, {})
+      size = ENV.fetch('NOSQL_POOL_SIZE', 3)
+      timeout = ENV.fetch('NOSQL_TIMEOUT', 5)
+
       @client_pool = ConnectionPool.new(size:, timeout:) do
-        Aws::DynamoDB::Client.new(conn_args)
+        Aws::DynamoDB::Client.new(_connection_args)
       end
       Rails.logger.info("Connections established to DynamoDB table: #{@table}")
     rescue Aws::Errors::ServiceError => e
@@ -200,6 +204,31 @@ module Nosql
       Rails.logger.error(out)
       Rails.logger.error(details) unless details.nil?
       out
+    end
+
+    # Build the DynamoDB database adapter arguments
+    def _connection_args
+      if Rails.env.docker?
+        nosql_args = {
+          table: ENV.fetch('NOSQL_TABLE', 'dmsp-local'),
+          size: ENV.fetch('NOSQL_POOL_SIZE', 3),
+          timeout: ENV.fetch('NOSQL_TIMEOUT', 5),
+          connection: {
+            region: ENV.fetch('AWS_REGION', 'us-west-2'),
+            endpoint: "http://#{[ENV['NOSQL_HOST'], ENV['NOSQL_PORT']].join(':')}",
+            credentials: Aws::Credentials.new(ENV['NOSQL_ACCESS_KEY'], ENV['NOSQL_ACCESS_SECRET'])
+          }
+        }
+      else
+        region = ENV.fetch('AWS_REGION', 'us-west-2')
+
+        nosql_args = {
+          table: ENV.fetch('NOSQL_TABLE', 'dmsp-local'),
+          size: ENV.fetch('NOSQL_POOL_SIZE', 3),
+          timeout: ENV.fetch('NOSQL_TIMEOUT', 5),
+          connection: { region: }
+        }
+      end
     end
 
     # ---------------------------------------------------------------------------------

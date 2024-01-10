@@ -4,10 +4,7 @@ require 'json-schema'
 require 'securerandom'
 
 # A Data Management and Sharing Plan
-#
-# Note that NOSQL_ADAPTER and NOSQL_ITEM_CLASS are defined and preloaded during
-# Rails initialization!
-class Dmp < NOSQL_ITEM_CLASS
+class Dmp < NosqlRecord
   MSG_NO_JSON_SCHEMA = 'No JSON Schema found in the ./lib/ directory!'
 
   def initialize(**args)
@@ -17,7 +14,7 @@ class Dmp < NOSQL_ITEM_CLASS
   class << self
     def all()
       # TODO: Remove this once OpenSearch is in place
-      NOSQL_ADAPTER.query
+      @adapter.query
     end
 
     # Fetch the item by it's DMP ID and version
@@ -28,7 +25,7 @@ class Dmp < NOSQL_ITEM_CLASS
     def find_by_dmp_id(dmp_id:, version: nil)
       # Find the record
       key = NOSQL_ITEM_CLASS.from_dmp_id(dmp_id:, version:)
-      item = NOSQL_ADAPTER.get(key:)
+      item = @adapter.get(key:)
       return nil unless item.is_a?(NOSQL_ITEM_CLASS)
 
       # Make sure it matches the record that was asked for!
@@ -46,7 +43,7 @@ class Dmp < NOSQL_ITEM_CLASS
     # return false unless valid?
 
     Rails.logger.debug("Pre-Save: #{inspect}")
-    NOSQL_ADAPTER.put(item: self)
+    @adapter.put(item: self)
   end
 
   # Delete (or Tombstone if registered) a DMP ID
@@ -56,7 +53,7 @@ class Dmp < NOSQL_ITEM_CLASS
     return false if registered?
 
     @versions.each do |ver|
-      NOSQL_ADAPTER.delete(key: @key)
+      @adapter.delete(key: @key)
     end
     true
   end
@@ -101,7 +98,7 @@ class Dmp < NOSQL_ITEM_CLASS
     @metadata['modified'] = now
     @metadata['tombstoned'] = now
 
-    NOSQL_ADAPTER.put(key: @key, json: to_nosql_hash)
+    @adapter.put(key: @key, json: to_nosql_hash)
   end
 
   private
