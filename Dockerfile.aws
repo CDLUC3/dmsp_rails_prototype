@@ -53,8 +53,11 @@ USER rails:rails
 #   25 - email server
 #   80 - load balancer
 #   3306 - database server
-EXPOSE 25 80 3306
+EXPOSE 25 3000 3306
 
 ENTRYPOINT ["bin/docker-entrypoint"]
 
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-b", "0.0.0.0", "-p", "80"]
+# Not working here. Complains about binding 80 to 0.0.0.0 but if I add a bind argument
+# it still fails with a `Invalid URI: 0.0.0.0` error
+# CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-b", "0.0.0.0", "-p", "80"]
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-p", "3000"]
