@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-]# Concern that provides hooks to an external parameter store
+# Concern that provides hooks to an external parameter store
 module ExternalParameters
   extend ActiveSupport::Concern
 
