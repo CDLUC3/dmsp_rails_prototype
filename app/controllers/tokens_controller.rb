@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
 class TokensController < ApplicationController
-  include ExternalParameters
 
   # GET /token?code[AuthCode]
   def exchange_code_for_token
-    puts event['queryStringParameters']
-
     opts = _options(code: event.fetch('queryStringParameters', {})['code'])
     resp = HTTParty.send(:post, ENV['AUTH_ENDPOINT'], opts)
     return { statusCode: 500, body: "Unable to acquire token" } if resp.body.nil? || resp.body.empty?
@@ -18,8 +15,9 @@ class TokensController < ApplicationController
 
   def _options
     callback_uri = ENV['CALLBACK_ENDPOINT']
-    client_id = _get_ssm_val(key: "#{ENV['SSM_PATH']}DmspClientId")
-    client_secret = _get_ssm_val(key: "#{ENV['SSM_PATH']}DmspClientSecret")
+    # AUTHN ENV values are defined in the config/initializers/secrets_manager.rb
+    client_id = ENV['AUTHN_CLIENT_ID']
+    client_secret = ENV['AUTHN_CLIENT_SECRET']
 
     ret = {
       headers: {

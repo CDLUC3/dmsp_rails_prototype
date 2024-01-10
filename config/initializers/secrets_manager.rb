@@ -28,6 +28,8 @@ unless Rails.env.docker?
       ENV['DATABASE_USERNAME'] = secret_hash['username']
       ENV['DATABASE_PASSWORD'] = secret_hash['password']
       ENV['DATABASE_NAME'] = secret_hash['dbname']
+      ENV['AUTHN_CLIENT_ID'] = secret_hash['']
+      ENV['AUTHN_CLIENT_SECRET'] = secret_hash['']
     end
   end
 end
