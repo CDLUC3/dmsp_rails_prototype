@@ -24,10 +24,13 @@ docker:
 test:
   <<: *default
 
-# Development is a development environment located in an AWS ECS cluster
+development:
+  <<: *default
+
+# AwsDev is a development environment located in an AWS ECS cluster
 # a CodePipeline will deploy to this environment automatically when code
 # is merged into the development branch of the GitHub repository
-development:
+awsdev:
   <<: *default
 
 # Staging is an environment designed for user acceptance testing (release candidate).
