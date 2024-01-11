@@ -17,6 +17,7 @@ ENV BUNDLE_DEPLOYMENT="1" \
 FROM base as build
 
 RUN apt-get update -qq && \
+    apt-get upgrade -q && \
     apt-get install -y build-essential build-essential git libvips pkg-config default-libmysqlclient-dev
 
 # Install application gems
