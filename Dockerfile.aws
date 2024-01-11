@@ -50,8 +50,8 @@ RUN useradd rails --create-home --shell /bin/bash && \
 USER rails:rails
 
 # expose correct ports
-#   25 - email server
-#   80 - load balancer
+#   25   - email server
+#   300  - load balancer
 #   3306 - database server
 EXPOSE 25 3000 3306
 
