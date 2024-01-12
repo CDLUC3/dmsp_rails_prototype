@@ -5,7 +5,7 @@ module Nosql
 
   # Singleton! Client adapter for the DynamoDB NoSQL table
   class Adapter
-    MSG_MISSING_TABLE = 'No Dynamo Table defined! :table should be defined in the initializer!'.freeze
+    MSG_MISSING_TABLE = 'No NoSQL Table defined! :table should be defined in the initializer!'.freeze
     MSG_NOSQL_ERROR = 'NoSQL Error - %{msg}'.freeze
     MSG_UNABLE_TO_CONNECT = 'Unable to establish a connection to the NoSQL table %{table}'.freeze
 

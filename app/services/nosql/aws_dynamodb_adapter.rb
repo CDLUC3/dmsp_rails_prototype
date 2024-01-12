@@ -22,14 +22,14 @@ module Nosql
     # @option args [Hash] :connection Arguments passed on to the connection during initialization
     # @raise [NosqlError] When an Aws::Errors::ServiceError occurs
     def initialize(**args)
-      @debug = Rails.logger.level == :debug
-      @table = ENV.fetch('NOSQL_TABLE', 'dmsp-local')
-      raise NosqlError, _handle_error(msg: MSG_MISSING_TABLE) if args[:table].nil?
-
+      args[:table] = ENV.fetch('NOSQL_TABLE', 'dmsp-local')
       super(**args)
 
       size = ENV.fetch('NOSQL_POOL_SIZE', 3)
-      timeout = ENV.fetch('NOSQL_TIMEOUT', 5)
+      timeout = ENV.fetch('NOSQL_TIMEOUT', 5).to_f
+
+p "size: #{size}, timeout: #{timeout}"
+pp _connection_args
 
       @client_pool = ConnectionPool.new(size:, timeout:) do
         Aws::DynamoDB::Client.new(_connection_args)
@@ -209,25 +209,13 @@ module Nosql
     # Build the DynamoDB database adapter arguments
     def _connection_args
       if Rails.env.docker?
-        nosql_args = {
-          table: ENV.fetch('NOSQL_TABLE', 'dmsp-local'),
-          size: ENV.fetch('NOSQL_POOL_SIZE', 3),
-          timeout: ENV.fetch('NOSQL_TIMEOUT', 5),
-          connection: {
-            region: ENV.fetch('AWS_REGION', 'us-west-2'),
-            endpoint: "http://#{[ENV['NOSQL_HOST'], ENV['NOSQL_PORT']].join(':')}",
-            credentials: Aws::Credentials.new(ENV['NOSQL_ACCESS_KEY'], ENV['NOSQL_ACCESS_SECRET'])
-          }
+        {
+          region: ENV.fetch('AWS_REGION', 'us-west-2'),
+          endpoint: "http://#{[ENV['NOSQL_HOST'], ENV['NOSQL_PORT']].join(':')}",
+          credentials: Aws::Credentials.new(ENV['NOSQL_ACCESS_KEY'], ENV['NOSQL_ACCESS_SECRET'])
         }
       else
-        region = ENV.fetch('AWS_REGION', 'us-west-2')
-
-        nosql_args = {
-          table: ENV.fetch('NOSQL_TABLE', 'dmsp-local'),
-          size: ENV.fetch('NOSQL_POOL_SIZE', 3),
-          timeout: ENV.fetch('NOSQL_TIMEOUT', 5),
-          connection: { region: }
-        }
+        { region: ENV.fetch('AWS_REGION', 'us-west-2') }
       end
     end
 

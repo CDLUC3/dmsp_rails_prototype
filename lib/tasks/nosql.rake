@@ -6,11 +6,14 @@ namespace :nosql do
   desc 'Initialize the NoSQL database if it does not exist'
   task prepare_local: :environment do
     # Only allow this in the local Docker dev environment! Cloud based environments
-    # should construct the NoSQL database via Infrastructure as Code
+    # should construct the NoSQL database via Infrastructure as Code and then
+    # update these commands to use their version of the Nosql::Adapter class
     if Rails.env.docker?
       begin
+        ENV['NOSQL_TABLE'] = ENV.fetch('NOSQL_TABLE', 'dmsp-local')
+        adapter= Nosql::AwsDynamodbAdapter.new
         puts "Checking if NoSQL database needs to be initialized ..."
-        NOSQL_ADAPTER.send(:initialize_database)
+        adapter.send(:initialize_database)
         puts "DONE"
       end
     else
@@ -24,8 +27,10 @@ namespace :nosql do
     # should construct the NoSQL database via Infrastructure as Code
     if Rails.env.docker?
       begin
+        ENV['NOSQL_TABLE'] = ENV.fetch('NOSQL_TABLE', 'dmsp-local')
+        adapter= Nosql::AwsDynamodbAdapter.new
         puts "Purging local NoSQL records ..."
-        NOSQL_ADAPTER.send(:purge_database)
+        adapter.send(:purge_database)
         puts "DONE"
       end
     else
