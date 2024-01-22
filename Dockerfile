@@ -15,7 +15,7 @@ ENV BUNDLE_DEPLOYMENT="1" \
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
-RUN apt-get update -qq && \
+RUN apt-get update -qq && apt-get upgrade -y && \
     apt-get install -y build-essential build-essential git libvips pkg-config default-libmysqlclient-dev
 
 # Install application gems
@@ -34,7 +34,7 @@ RUN bundle exec bootsnap precompile app/ lib/
 FROM base
 
 # Install packages needed for deployment
-RUN apt-get update -qq && \
+RUN apt-get update -qq && apt-get upgrade -y && \
     apt-get install --no-install-recommends -y curl libpq-dev libvips default-libmysqlclient-dev && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
