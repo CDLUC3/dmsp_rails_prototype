@@ -41,7 +41,7 @@ Purge all records from the local NoSQL database: `docker-compose exec app bin/ra
 
 ## Deploying to the AWS cloud
 
-The Github repository has a corresponding branch for each of the environments except `docker`. When code is merged into the appropriate branch, an AWS CodePipeline is triggered which will run any tests and then build the Docker image within the AWS environment using the `buildspec.yaml` file.
+The Github repository has a corresponding branch for each of the environments except `development`. When code is merged into the appropriate branch, an AWS CodePipeline is triggered which will run any tests and then build the Docker image within the AWS environment using the `buildspec.yaml` file.
 
 The new image will then be picked up by AWS Fargate and deployed.
 

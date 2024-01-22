@@ -68,4 +68,7 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Needed to let the app reload files after they are changed in the Docker container
+  config.reload_classes_only_on_change = false
 end

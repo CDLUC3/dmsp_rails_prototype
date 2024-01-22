@@ -81,7 +81,7 @@ module Nosql
     # @return [boolean] Whether or not the action was successful
     # @raise [NosqlItemError] When not in the local Docker development environment
     def initialize_database
-      raise NosqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.development?
       raise NotImplementedError, "Subclasses must implement this method"
     end
 
@@ -91,7 +91,7 @@ module Nosql
     #
     # @raise [NosqlItemError] When not in the local Docker development environment
     def purge_database
-      raise NosqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.development?
       raise NotImplementedError, "Subclasses must implement this method"
     end
   end

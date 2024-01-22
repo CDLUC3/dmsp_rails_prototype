@@ -27,10 +27,6 @@ module Nosql
 
       size = ENV.fetch('NOSQL_POOL_SIZE', 3)
       timeout = ENV.fetch('NOSQL_TIMEOUT', 5).to_f
-
-p "size: #{size}, timeout: #{timeout}"
-pp _connection_args
-
       @client_pool = ConnectionPool.new(size:, timeout:) do
         Aws::DynamoDB::Client.new(_connection_args)
       end
@@ -208,7 +204,7 @@ pp _connection_args
 
     # Build the DynamoDB database adapter arguments
     def _connection_args
-      if Rails.env.docker?
+      if Rails.env.development?
         {
           region: ENV.fetch('AWS_REGION', 'us-west-2'),
           endpoint: "http://#{[ENV['NOSQL_HOST'], ENV['NOSQL_PORT']].join(':')}",
@@ -229,7 +225,7 @@ pp _connection_args
     # @return [boolean] Whether or not the action was successful
     # @raise [NosqlItemError] When not in the local Docker development environment
     def initialize_database
-      raise NosqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_CREATE unless Rails.env.development?
 
       resp = @client_pool.with do |client|
         puts "Checking to see if the NoSQL table #{@table} exists ..."
@@ -267,7 +263,7 @@ pp _connection_args
     #
     # @raise [NosqlItemError] When not in the local Docker development environment
     def purge_database
-      raise NosqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.docker?
+      raise NosqlItemError, MSG_NO_TABLE_PURGE unless Rails.env.development?
 
       puts 'Gathering DMP ID records from the local DyanmoDB'
       @client_pool.with do |client|

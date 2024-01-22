@@ -48,9 +48,8 @@ RUN useradd rails --create-home --shell /bin/bash && \
 USER rails:rails
 
 # Build a discardable master.key and credentials.yml.enc file for docker deployment
-RUN rm -rf config/credentials.yml.enc && \
-    rm -rf config/master.key && \
-    EDITOR=nano bundle exec rails credentials:edit -e docker
+# All sensitive info should live in the `./.env` file for your local Docker dev env.
+# RUN EDITOR='echo "$(cat config/credentials.yml.example)" >' bin/rails credentials:edit -e development
 
 # Entrypoint prepares the database and fetches any necessary SSM params.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]

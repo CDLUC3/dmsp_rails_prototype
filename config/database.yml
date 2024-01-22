@@ -15,17 +15,13 @@ default: &default
   host: <%= ENV['DB_HOST'] %>
   port: <%= ENV['DP_PORT'] %>
 
-# For local development inside a Docker container
-docker:
-  <<: *default
-
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
 
-# For local development outside the Docker container. Note that this requires
+# For local development inside the Docker container. Note that this requires
 # access to cloud resources for your MySQL and NoSQL databases
 development:
   <<: *default

@@ -8,7 +8,7 @@ namespace :nosql do
     # Only allow this in the local Docker dev environment! Cloud based environments
     # should construct the NoSQL database via Infrastructure as Code and then
     # update these commands to use their version of the Nosql::Adapter class
-    if Rails.env.docker?
+    if Rails.env.development?
       begin
         ENV['NOSQL_TABLE'] = ENV.fetch('NOSQL_TABLE', 'dmsp-local')
         adapter= Nosql::AwsDynamodbAdapter.new
@@ -25,7 +25,7 @@ namespace :nosql do
   task purge_local: :environment do
     # Only allow this in the local Docker dev environment! Cloud based environments
     # should construct the NoSQL database via Infrastructure as Code
-    if Rails.env.docker?
+    if Rails.env.development?
       begin
         ENV['NOSQL_TABLE'] = ENV.fetch('NOSQL_TABLE', 'dmsp-local')
         adapter= Nosql::AwsDynamodbAdapter.new

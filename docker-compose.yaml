@@ -34,8 +34,6 @@ services:
       - dynamodb-local
     build: .
     command: "bundle exec rails server -p 3000 -b '0.0.0.0'"
-    volumes:
-      - ".:/app"
     ports:
       - "3001:3000"
     expose:
@@ -44,7 +42,7 @@ services:
       - mysql
       - "dynamodb-local"
     environment:
-      RAILS_ENV: "docker"
+      RAILS_ENV: "development"
       NOSQL_HOST: dynamodb-local
       NOSQL_PORT: "8000"
       DB_HOST: mysql
@@ -52,6 +50,8 @@ services:
       DB_NAME: "${DB_NAME}"
       DB_USER: "${DB_USER}"
       DB_PASSWORD: "${DB_PASSWORD}"
+    volumes:
+      - .:/rails:rw
     env_file:
       - '.env'
 
