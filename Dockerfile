@@ -16,7 +16,7 @@ ENV BUNDLE_DEPLOYMENT="1" \
 FROM base as build
 
 RUN apt-get update -qq && apt-get upgrade -y && \
-    apt-get install -y build-essential build-essential git libvips pkg-config default-libmysqlclient-dev
+    apt-get install -y build-essential build-essential git libvips pkg-config
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -35,7 +35,6 @@ FROM base
 
 # Install packages needed for deployment
 RUN apt-get update -qq && apt-get upgrade -y && \
-    apt-get install --no-install-recommends -y curl libpq-dev libvips default-libmysqlclient-dev && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Copy built artifacts: gems, application
