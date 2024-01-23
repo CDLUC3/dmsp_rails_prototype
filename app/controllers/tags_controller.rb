@@ -4,6 +4,9 @@ class TagsController < ApplicationController
   # GET /tags
   def index
     @tags = Tag.all
+
+    puts "Current user: #{Current.user.inspect}"
+
     render json: @tags
   end
 

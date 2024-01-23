@@ -20,6 +20,7 @@ RUN apt-get update -qq && apt-get upgrade -y && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
+RUN gem update bundler
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile

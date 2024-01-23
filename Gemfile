@@ -5,9 +5,6 @@ ruby "3.2.2"
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.2"
 
-# Use sqlite3 as the database for Active Record
-# gem "sqlite3", "~> 1.4"
-
 # Use MySQL
 gem "mysql2"
 
@@ -18,13 +15,13 @@ gem "puma", ">= 5.0"
 # gem "jbuilder"
 
 # Use Redis adapter to run Action Cable in production
-# gem "redis", ">= 4.0.1"
+gem "redis", ">= 4.0.1"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
-# gem "kredis"
+gem "kredis"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -51,14 +48,20 @@ gem 'httparty'
 # conforming to JSON Schema Draft 6: https://github.com/voxpupuli/json-schema
 gem 'json-schema'
 
+# User Authentication
+gem 'authentication-zero'
+
 group :aws do
+  # Use Rack::Ratelimit to rate limit requests [https://github.com/jeremy/rack-ratelimit]
+  gem "rack-ratelimit"
+
   # Support for interaction with AWS resources
   gem 'aws-sdk-secretsmanager'
 
   # DynamoDB adapter
   gem 'aws-sdk-dynamodb'
 
-  # S3 Bcuket adapter
+  # S3 Bucket adapter
   gem 'aws-sdk-s3'
 
   # SSM parameter store adapter
