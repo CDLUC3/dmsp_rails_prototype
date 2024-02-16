@@ -1,7 +1,7 @@
 require 'aws-sdk-secretsmanager'
 
 # Skip this if the environment is our local Docker dev container
-unless Rails.env.development?
+unless Rails.env.development? || Rails.env.test?
   # Determine the env and then fetch the RDS secret
   env = Rails.env.production? ? 'prd' : (Rails.env.staging? ? 'stg' : 'dev')
   secret_name = "dmp-hub-#{env}-rails-app"

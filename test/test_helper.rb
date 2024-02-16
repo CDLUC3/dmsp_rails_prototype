@@ -10,6 +10,9 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # Configure the test NoSQL tables
+    # --------------------------------
+    ENV['NOSQL_DMPS_TABLE'] = 'dmpsTest'
+    ENV['NOSQL_TYPEAHEADS_TABLE'] = 'typeaheadsTest'
   end
 end

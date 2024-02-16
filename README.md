@@ -14,12 +14,11 @@ See the [API Wiki](https://github.com/CDLUC3/dmsp_rails_prototype/wiki/API-Overv
 Prerequisites:
 - Docker >= version 20.10
 - Docker Compose >= version 2.23
-- MySQL >= version 8.2
 - [AWS NoSQL Workbench](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/workbench.settingup.html)
 
 The local Docker development environment uses the `docker-compose.yaml` file along with a `.env` file that contains all of the environment variable config required to run the application.
 
-Both the MySQL and DynamoDB databases are persisted between Docker container runs. The contents are stored in `docker/`. This directory is ignored by Git.
+Both the MySQL (test and development) and DynamoDB databases are persisted between Docker container runs. The contents are stored in `docker/`. This directory is ignored by Git.
 
 You will first need to make a copy of the `.env.example` file, `cp .env.example .env`, and then update it for your local system.
 
@@ -30,6 +29,10 @@ This will create a small local network running the 2 databases and the Rails app
 **TODO:** For some reason the Rails app is starting before mysql has had a chance to finish starting up, so you have to manually start the app in the Docker desktop console once mysql is running.
 
 Once the system is up and running, you can interact with it on port 8001. For example: `curl -v http://localhost:8001/tags`
+
+## Testing
+
+To run tests, you must first startup the Docker environment `docker-compose up`. Then, in a separate terminal tab/window, run `docker-compose exec app bin/rails test` (or `docker-compose exec app bin/rails test test/models/tag_test.rb:12` if you want to run specific tests)
 
 ### Other helpful commands for the local Docker development environment
 

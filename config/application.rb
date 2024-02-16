@@ -31,5 +31,8 @@ module ApiOnly
 
     # Set the default host
     config.action_mailer.default_url_options = { host: ENV['RAILS_HOST'] }
+
+    # Custom application config
+    config.x.application_name = 'DMSP'
   end
 end
