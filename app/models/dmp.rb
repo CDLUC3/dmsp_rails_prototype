@@ -7,7 +7,11 @@ require 'securerandom'
 class Dmp < NosqlRecord
   MSG_NO_JSON_SCHEMA = 'No JSON Schema found in the ./lib/ directory!'
 
+  attr_reader :versions
+
   def initialize(**args)
+    @adapter = Nosql::DynamodbDmpAdapter.new(**{ table: ENV['NOSQL_DMPS_TABLE'] })
+
     super(**args)
   end
 

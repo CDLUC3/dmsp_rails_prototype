@@ -1,0 +1,259 @@
+{
+  "PK": "DMP#localhost:3001/99.88888/7Z.ABC1230z0Z",
+  "SK": "VERSION#latest",
+  "contact": {
+    "contact_id": {
+      "identifier": "https://orcid.org/0000-0000-0000-0000",
+      "type": "orcid"
+    },
+    "dmproadmap_affiliation": {
+      "affiliation_id": {
+        "identifier": "https://ror.org/12344556",
+        "type": "ror"
+      },
+      "name": "Example University"
+    },
+    "mbox": "jane.doe@example.com",
+    "name": "Doe, Jane"
+  },
+  "contributor": [
+    {
+      "dmproadmap_affiliation": {
+        "affiliation_id": {
+          "identifier": "https://ror.org/12344556",
+          "type": "ror"
+        },
+        "name": "Example University"
+      },
+      "contributor_id": {
+        "identifier": "https://orcid.org/0000-0000-0000-0000",
+        "type": "orcid"
+      },
+      "mbox": "Jane.Doe@example.com",
+      "name": "Doe, Jane",
+      "role": [
+        "http://credit.niso.org/contributor-roles/data-curation",
+        "http://credit.niso.org/contributor-roles/investigation"
+      ]
+    },
+    {
+      "dmproadmap_affiliation": {
+        "affiliation_id": {
+          "identifier": "https://ror.org/23864587935",
+          "type": "ror"
+        },
+        "name": "Another University"
+      },
+      "mbox": "someone.else@example.org",
+      "name": "Else, Someone",
+      "role": [
+        "http://credit.niso.org/contributor-roles/project-administration"
+      ]
+    },
+    {
+      "name": "So PhD., So N.",
+      "role": [
+        "http://credit.niso.org/contributor-roles/investigation"
+      ]
+    }
+  ],
+  "cost": [
+    {
+      "currency_code": "USD",
+      "title": "Preservation costs",
+      "description": "The estimated costs for preserving our data for 20 years",
+      "value": 10000
+    }
+  ],
+  "created": "2022-11-20T10:11:12+00:00",
+  "dataset": [
+    {
+      "dataset_id": {
+        "identifier": "1550",
+        "type": "other"
+      },
+      "data_quality_assurance": [
+        "We will verify the quality of all data collected during this project through a third party."
+      ],
+      "description": "<p>A collection of radiographic images of coral.</p>",
+      "distribution": [
+        {
+          "data_access": "open",
+          "host": {
+            "description": "The test data repository for oceanographic information.",
+            "dmproadmap_host_id": {
+              "identifier": "https://www.re3data.org/api/v1/repository/r3d0000000000000",
+              "type": "url"
+            },
+            "title": "Generic Ocean Information Data Repository",
+            "url": "http://example.org/repo"
+          },
+          "license": [
+            {
+              "license_ref": "https://spdx.org/licenses/CC-BY-4.0.json",
+              "start_date": "2021-05-18T00:00:00Z"
+            }
+          ],
+          "title": "Anticipated distribution of coral images"
+        }
+      ],
+      "issued": "2026-05-18T00:00:00Z",
+      "keyword": [
+        "Earth and related environmental sciences",
+        "Coral"
+      ],
+      "metadata": [
+        {
+          "description": "Example Core - a tests metadata standard",
+          "metadata_standard_id": {
+            "identifier": "https://rdamsc.bath.ac.uk/api2/2485ty247y7t9y429t4295t",
+            "type": "url"
+          }
+        }
+      ],
+      "personal_data": "unknown",
+      "preservation_statement": "The images will be depositied in a repository and made available until 2050",
+      "security_and_privacy": [
+        {
+          "title": "Data security",
+          "description": "We're going to encrypt this one."
+        }
+      ],
+      "sensitive_data": "unknown",
+      "technical_resource": [
+        {
+          "name": "Example University's thermal imaging camera 1234",
+          "description": "A super powerful thermal imaging camera"
+        }
+      ],
+      "title": "Images of brain coral time series",
+      "type": "dataset"
+    }
+  ],
+  "description": "<p>The example data management plan for the DMPHub.</p>",
+  "dmphub_created_at": "2022-11-20T10:11:12+00:00",
+  "dmphub_modification_day": "2022-11-29",
+  "dmphub_modifications": [
+    {
+      "id": "ZYXW9876",
+      "provenance": "datacite",
+      "timestamp": "2023-07-27T15:08:32+07:00",
+      "note": "data received from event data",
+      "status": "pending",
+      "dmproadmap_related_identifiers": [
+        {
+          "work_type": "dataset",
+          "descriptor": "references",
+          "type": "doi",
+          "identifier": "https://dx.doi.org/77.6666/H5H5H5"
+        },
+        {
+          "work_type": "paper",
+          "descriptor": "is_cited_by",
+          "type": "url",
+          "identifier": "https://academic.site/papers/123"
+        }
+      ],
+      "funding": {
+        "name": "National Science Foundation",
+        "funder_id": {
+          "type": "ror",
+          "identifier": "https://ror.org/021nxhr62"
+        },
+        "funding_status": "granted",
+          "grant_id": {
+          "identifier": "https://doi.org/11.1111/2019.22702-3",
+          "type": "doi"
+        }
+      }
+     },
+     {
+       "id": "ZYXW9878",
+       "provenance": "datacite",
+       "timestamp": "2023-07-27T15:08:52+07:00",
+       "note": "data received from event data",
+       "status": "accepted",
+       "dmproadmap_related_identifiers": [
+         {
+           "work_type": "article",
+           "descriptor": "is_cited_by",
+           "type": "url",
+           "identifier": "https://doi.org/22.33333/pubmed.1242345234"
+         }
+       ]
+     }
+  ],
+  "dmphub_provenance_id": "PROVENANCE#testing",
+  "dmphub_provenance_identifier": "https://example.com/tests/989898",
+  "dmphub_registered_at": "2022-11-25T19:49:08+00:00",
+  "dmphub_updated_at": "2022-11-29T19:49:08+00:00",
+  "dmphub_versions": [
+    {
+      "timestamp": "2022-11-29T19:49:08+00:00",
+      "url": "http://localhost:3001/dmps/99.88888%2F7Z.ABC1230z0Z?version=2022-11-29T19:49:08+00:00"
+    },
+    {
+      "timestamp": "2022-11-25T19:49:08+00:00",
+      "url": "http://localhost:3001/dmps/99.88888%2F7Z.ABC1230z0Z?version=2022-11-25T19:49:08+00:00"
+    },
+    {
+      "timestamp": "2022-11-20T10:11:12+00:00",
+      "url": "http://localhost:3001/dmps/99.88888%2F7Z.ABC1230z0Z?version=2022-11-20T10:11:12+00:00"
+    }
+  ],
+  "dmproadmap_external_system_identifier": "989898",
+  "dmproadmap_featured": "true",
+  "dmproadmap_privacy": "public",
+  "dmproadmap_related_identifiers": [
+    {
+      "descriptor": "describes",
+      "identifier": "https://doi.org/10.21966/1.566666",
+      "type": "doi",
+      "work_type": "dataset"
+    },
+    {
+      "descriptor": "references",
+      "identifier": "https://doi.org/10.5281/zenodo.5719523",
+      "type": "doi",
+      "work_type": "article"
+    },
+    {
+      "descriptor": "is_metadata_for",
+      "identifier": "https://example.com/api/v2/dmps/989898.pdf",
+      "type": "url",
+      "work_type": "output_management_plan"
+    }
+  ],
+  "dmp_id": {
+    "identifier": "https://localhost:3001/99.88888/7Z.ABC1230z0Z",
+    "type": "doi"
+  },
+  "ethical_issues_description": "We will need to ensure that we anonymie our data",
+  "ethical_issues_exist": "yes",
+  "ethical_issues_report": "https://example.edu/privacy_policy",
+  "language": "eng",
+  "modified": "2022-11-29T19:49:08+00:00",
+  "project": [
+    {
+      "description": "Our sample project for the DMPHub.",
+      "end": "2024-11-29T19:48:57Z",
+      "funding": [
+        {
+          "funder_id": {
+            "identifier": "https://ror.org/0000000000",
+            "type": "ror"
+          },
+          "funding_status": "granted",
+          "name": "National Funding Institute",
+          "grant_id": {
+            "type": "other",
+            "identifier": "34562356"
+          }
+        }
+      ],
+      "start": "2015-05-12T00:00:00Z",
+      "title": "DMPHub example DMP project."
+    }
+  ],
+  "title": "Example DMP record for the DMPHub."
+}

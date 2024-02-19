@@ -4,11 +4,6 @@
 if [ "${3}" == "rails" ] && [ "${4}" == "server" ]; then
   echo "Running db:prepare to run pending migrations (or initial the relational DB if this is the first time)"
   ./bin/rails db:prepare # --trace
-
-  if [ "${RAILS_ENV}" == "development" ]; then
-    echo "Verifying connection to the NoSQL databases."
-    ./bin/rails nosql:prepare_local
-  fi
 fi
 
 exec "${@}"

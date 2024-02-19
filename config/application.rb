@@ -34,5 +34,7 @@ module ApiOnly
 
     # Custom application config
     config.x.application_name = 'DMSP'
+    # config.x.default_nosql_connection_pool_size = 3
+    # config.x.default_nosql_connection_timeout = 5 # seconds
   end
 end

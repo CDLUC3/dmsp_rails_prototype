@@ -5,13 +5,9 @@ module Nosql
 
   # A NoSQL item/record
   class Item
-    MSG_NO_DOI_BASE_URL = 'No ENV[\'DOI_BASE_URL\'] defined!'.freeze
-    MSG_NO_DOI_SHOULDER = 'No ENV[\'DOI_SHOULDER\'] defined!'.freeze
-    MSG_NO_DMP_ID_FOR_NEW = 'No DMP IDs allowed when creating a new item!'.freeze
-    MSG_UNABLE_TO_ACQUIRE_NEW_ID = 'Unable to acquire a new DMP ID after 10 attempts!'.freeze
+    MSG_NO_RAILS_HOST = 'no ENV[\'RAILS_HOST\'] defined!'.freeze
 
-    attr_reader :doi_shoulder, :doi_base_url, :key, :dmp_id, :versions, :errors
-    attr_accessor :metadata
+    attr_reader :adapter, :key, :errors
 
     # Generic initializer. The initializer of the classes that inherit from this class
     # should call `super(**args)` first and then parse the :args to define the contents
@@ -33,16 +29,13 @@ module Nosql
     #
     # All other entries in the :args Hash should be mapped onto the @metadata Hash
     def initialize(**args)
-      raise ItemError, MSG_NO_DMP_ID_FOR_NEW unless args[:dmp_id].nil?
+      raise ItemError, MSG_NO_RAILS_HOST if ENV['RAILS_HOST'].nil?
 
-      @doi_base_url = ENV['DOI_BASE_URL']
-      @doi_shoulder = ENV['DOI_SHOULDER']
-      raise ItemError, MSG_NO_DOI_BASE_URL if @doi_base_url.empty?
-      raise ItemError, MSG_NO_DOI_SHOULDER if @doi_shoulder.empty?
+      @adapter = args[:adapter]
+      raise Nosql::ItemError, 'An adapter must be defined' unless @adapter.is_a?(Nosql::Adapter)
 
-      @versions = []
-      @metadata = {}
       @errors = []
+      @key = { partition_key: '', sort_key: '' }
 
       # Parse the incoming args and map them to the appropriate attributes
       _from_hash(hash: args)

@@ -18,6 +18,7 @@ module Nosql
     # @raise [NosqlError] When a fatal error occurs
     def initialize(**args)
       raise NosqlError, _handle_error(msg: MSG_MISSING_TABLE) if args[:table].nil?
+
       @debug = Rails.logger.level == :debug
       @table = args[:table]
     end

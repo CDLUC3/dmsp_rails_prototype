@@ -4,42 +4,43 @@ require 'securerandom'
 
 module Nosql
   # A NoSQL item/record
-  class AwsDynamodbItem < Item
-    PARTITION_KEY_DMP_PREFIX = 'DMP#'.freeze
-    PARTITION_KEY_DMP_REGEX = %r{DMP#[a-zA-Z0-9\-_.]+/[a-zA-Z0-9]{2}\.[a-zA-Z0-9./:]+}.freeze
+  class DynamodbTypeaheadItem < Item
 
-    SORT_KEY_DMP_PREFIX = 'VERSION#'.freeze
-    SORT_KEY_DMP_REGEX = /VERSION#\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}/.freeze
+    attr_reader :type, :source, :extras
 
-    SORT_KEY_DMP_LATEST_VERSION = "#{SORT_KEY_DMP_PREFIX}latest".freeze
-    SORT_KEY_DMP_TOMBSTONE_VERSION = "#{SORT_KEY_DMP_PREFIX}tombstone".freeze
-
-    attr_reader :landing_page_url, :extras
-
-    # Initialize a new NosqlItem with either an RDA Common Standard JSON Hash or a NoSQL
-    # JSON Hash.
-    #   - If no :PK or :dmp_id is provided, a @key and @dmp_id will be generated
-    #   - If a :PK is provided, that :PK will be used as the @key and @dmp_id
-    #   - If a :dmp_id is provided and no :PK is provided, it will be used as the @key and @dmp_id
+    # Initialize a new NosqlItem for a Typeahead. Every Typeahead item must have the following
+    # fields:
+    #   - A :PK which defines the type of item. This ensures that all items of the same type are stored adjacent
+    #   - An :SK which should be a unique identifier for the item (e.g. http://ror.org/12345, http://localhost:3001/12345)
+    #   - If :_SOURCE is available, this indicates the creator of the item
+    #   - If :_SOURCE is left blank it will be set to https://[host]/[SecureRandom]
+    #   - If :_SOURCE_SYNCED_AT is available, this indicates the last time the item was updated by the :_SOURCE
+    #   - If :_SOURCE_SYNCED_AT is left blank it will be set here.
     #
-    # Additional entries in :args are handled as follows:
-    #   - :dmphub_versions are parsed and their :timestamp used to populate the @versions Array
-    #   - :dmphub_modifications are moved as is into the @modifications Array
-    #   - Other :dmphub_ prefixed entries are placed into the @extras Hash
-    #   - All other entries are placed into the @metadata Hash
+    # NOTES ON INSTITUTION ITEMS:
+    #   - Items created by another :_SOURCE system (e.g. ROR) CAN NOT BE UPDATED in this application. When you
+    #     want to record additional info about the item (e.g. An SSO entityId), you should create an entry in the
+    #     `institutions` where the `institutions.identifier` matches the `SK`.
+    #   - Queries from the API for an Institution are fetched from this table and any related info in the relational
+    #     DB's `institutions` table is appended.
+    #   - Institution items should include the following (beyond PK, SK and _SOURCE):
+    #     - :label [String] The institution's name
+    #     - :searchable_names [Array<String>] A list of names including doamins, acronyms and aliases (all lowercase)
+    #     - :active [Number] Whether or not the instition is a active (1 or 0)
+    #     - :funder [Number] Whether or not the instition is a Funder (1 or 0)
+    #     - :types [Array<String>] A list of types/categories (e.g. 'Education', 'Company', 'Government', etc.)
+    #
+    # SEE BELOW FOR EXAMPLES OF THE VARIOS ITEM TYPES (PKs)
     #
     # @param [Hash] args Initialization parameters
     # @option [String] :PK The partition key (otpional)
     # @option [String] :SK The sort key (optional)
-    # @option [Hash] :dmp_id The DMP ID (optional) (e.g. `{ "type": "doi", "identifier": "foo" }`)
     def initialize(**args)
       @extras = {}
-      # Set the default landing page URL
-      host = Rails.configuration.action_mailer.default_url_options[:host]
+      @source = Rails.configuration.x.application_name&.upcase&.gsub(' ', '-')
 
       super(**args)
 
-      @landing_page_url = Rails.application.routes.url_helpers.dmps_url(@dmp_id, host:)
     end
 
     # Convert the NoSQL item into a JSON record for the NoSQL database
@@ -50,11 +51,8 @@ module Nosql
 
       hash['PK'] = @key[:partion_key]
       hash['SK'] = @key[:sort_key]
-      hash['dmphub_provenance'] = 'dmsp-prototype' if hash['dmphub_provenance'].nil?
-      hash['dmp_id'] = { type: 'doi', identifier: @dmp_id }
-
-      hash['versions'] = _versions_for_nosql
-
+      hash['_SOURCE'] = @source if hash['_SOURCE'].nil?
+      hash['_SOURCE_SYNCED_AT'] = Time.now.utc.iso8601
       hash
     end
 
@@ -233,5 +231,69 @@ module Nosql
       key = _remove_sort_key_prefixing(key:)
       "#{SORT_KEY_DMP_PREFIX}#{key}"
     end
+
+    # EXAMPLE `PK: 'INSTITUTON'`:
+    # =========================================================================
+    # {
+    #   "PK": "INSTITUTION",
+    #   "SK": "https://ror.org/00dmfq477",
+    #   "acronyms": ["UCOP"],
+    #   "active": 1,
+    #   "addresses": [
+    #     {
+    #       "city": "Oakland",
+    #       "country_geonames_id": 6252001,
+    #       "geonames_city": {
+    #         "city": "Oakland",
+    #         "geonames_admin1": {
+    #           "ascii_name": "California",
+    #           "code": "US.CA",
+    #           "id": 5332921,
+    #           "name": "California"
+    #         },
+    #         "id": 5378538,
+    #         "license": {
+    #           "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+    #           "license": "http://creativecommons.org/licenses/by/3.0/"
+    #         },
+    #         "lat": 37.80437,
+    #         "lng": -122.2708,
+    #         "primary": false,
+    #       }
+    #     }
+    #   ],
+    #   "aliases": [],
+    #   "country": {
+    #     "country_code": "US",
+    #     "country_name": "United States"
+    #   },
+    #   "domain": "ucop.edu",
+    #   "external_ids": {
+    #     "FundRef": {
+    #       "all": ["100014576"],
+    #       "preferred": "100014576"
+    #     },
+    #     "ISNI": {
+    #       "all": ["0000 0004 0615 4051"],
+    #       "preferred": "0000 0004 0615 4051"
+    #     }
+    #   },
+    #   "funder": 1,
+    #   "label": "University of California Office of the President (ucop.edu)",
+    #   "links": ["https://www.ucop.edu"],
+    #   "name": "University of California Office of the President",
+    #   "parents": ["https://ror.org/00pjdza24"],
+    #   "relationships": [
+    #     {
+    #       "id": "https://ror.org/00pjdza24",
+    #       "label": "University of California System",
+    #       "type": "Parent"
+    #     }
+    #   ],
+    #   "searchable_names": ["university of california office of the president", "ucop.edu", "UCOP"],
+    #   "types": ["Education"],
+    #   "_SOURCE": "ROR",
+    #   "_SOURCE_SYNCED_AT": "2024-02-14T18:30:26Z"
+    # }
   end
 end
