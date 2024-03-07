@@ -21,7 +21,7 @@ The local Docker development environment uses the `docker-compose.yaml` file alo
 
 Both the MySQL and DynamoDB databases are persisted between Docker container runs. The contents are stored in `docker/`. This directory is ignored by Git.
 
-You will first need to make a copy of the `.env.example` file, `cp .env.example .env`, and then update it for your local systems.
+You will first need to make a copy of the `.env.example` file, `cp .env.example .env`, and then update it for your local systems again.
 
 Once the `.env` file is in place you can build the docker environment (local dynamodb, mysql and Rails app) by running: `docker-compose up`
 
